@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+     <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="306dp"
+        android:layout_height="300dp"
+        android:src="@drawable/googlemap" />
+     
+     <CheckBox
+        android:id="@+id/checkbox1"
+        android:layout_width="302dp"
+        android:layout_height="wrap_content"
+        android:text="Set Arrival Alarm" 
+        android:layout_margin="5dp"/>
+     <CheckBox
+        android:id="@+id/checkbox2"
+        android:layout_width="302dp"
+        android:layout_height="wrap_content"
+        android:text="Set Detour Warning" 
+        android:layout_margin="5dp"/>
+     <CheckBox
+        android:id="@+id/checkbox2"
+        android:layout_width="302dp"
+        android:layout_height="wrap_content"
+        android:text="Accept Nearby AD" 
+        android:layout_margin="5dp"/>
+    
+
+</LinearLayout>
