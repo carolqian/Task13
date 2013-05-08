@@ -12,30 +12,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle; 
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class ShowRoute extends FragmentActivity {  
 //	@Override
@@ -52,9 +47,6 @@ public class ShowRoute extends FragmentActivity {
     GoogleMap map;
     List<LatLng> polyz;
     JSONArray array;
-    
-    static final LatLng DUBLIN = new LatLng(53.344103999999990000,
-            -6.267493699999932000);
 
     @SuppressLint("NewApi")
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +89,23 @@ public class ShowRoute extends FragmentActivity {
 //            String endLocation = "3609 Beechwood Blvd Pittsburgh PA";
             startLocation = startLocation.replace(" ", "+");
             endLocation = endLocation.replace(" ", "+");
-            String stringUrl = "http://maps.googleapis.com/maps/api/directions/json?origin=" + startLocation + "&destination=" + endLocation + "&sensor=false&departure_time=1343605500&mode=transit";
+            int timeType = i.getIntExtra("timeType", 0);
+            String timeToken = "";
+            switch (timeType) {
+            	case TripPlan.NO_TIME:
+            		break;
+            	case TripPlan.DEPARTURE_TIME:
+            		timeToken += "&departure_time=";
+//            		timeToken += "1343605500";
+            		timeToken += i.getLongExtra("time", 1337675679473L);
+            		break;
+            	case TripPlan.ARRIVAL_TIME:
+            		timeToken += "&arrival_time=";
+            		timeToken += i.getLongExtra("time", 1337675679473L);
+            		break;
+            }
+            Log.d("route time:", timeToken);
+            String stringUrl = "http://maps.googleapis.com/maps/api/directions/json?origin=" + startLocation + "&destination=" + endLocation + "&sensor=false" + timeToken + "&mode=transit";
 //               String stringUrl = "http://maps.googleapis.com/maps/api/directions/json?origin=5000+Forbes+Ave+Pittsburgh+PA&destination=3609+Beechwood+Blvd+Pittsburgh+PA&sensor=false&departure_time=1343605500&mode=transit";
                 StringBuilder response = new StringBuilder();
             try {

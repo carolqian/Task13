@@ -2,34 +2,58 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:layout_marginLeft="10dp">
+    android:layout_marginLeft="10dp"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="303dp"
+        android:layout_height="42dp"
+        android:layout_alignParentLeft="true"
+        android:clickable="true"
+        android:maxLines="100"
+        android:onClick="onClick"
+        android:scrollbars="vertical"
+        android:text="From"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="248dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button1"
+        android:layout_below="@+id/TextView01"
+        android:ems="10"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="303dp"
+        android:layout_height="42dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/editText1"
+        android:clickable="true"
+        android:maxLines="100"
+        android:onClick="onClick"
+        android:scrollbars="vertical"
+        android:text="To"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/editText2"
         android:layout_width="246dp"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/editText1"
-        android:layout_below="@+id/editText1"
-        android:layout_marginTop="18dp"
+        android:layout_alignLeft="@+id/editText1"
+        android:layout_alignTop="@+id/TextView02"
+        android:layout_marginTop="22dp"
         android:ems="10" />
-
-    <CheckBox
-        android:id="@+id/checkbox1"
-        android:layout_width="132dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText2"
-        android:layout_marginTop="16dp"
-        android:text="Departure At" />
 
     <TimePicker
         android:id="@+id/timePicker1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/editText2"
-        android:layout_below="@+id/checkbox1"
-        android:layout_marginTop="16dp" />
+        android:layout_alignLeft="@+id/radioGroup1"
+        android:layout_below="@+id/radioGroup1" />
 
     <Button
         android:id="@+id/button1"
@@ -38,50 +62,35 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/timePicker1"
         android:layout_margin="10dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="15dp"
         android:text="Get Directions" />
 
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_width="303dp"
-        android:layout_height="42dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/editText2"
-        android:clickable="true"
-        android:maxLines="100"
-        android:onClick="onClick"
-        android:scrollbars="vertical"
-        android:textSize="20sp" />
-
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="248dp"
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:ems="10" />
-
-    <TextView
-        android:id="@+id/TextView02"
-        android:layout_width="303dp"
-        android:layout_height="42dp"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText1"
-        android:layout_toLeftOf="@+id/editText2"
-        android:clickable="true"
-        android:maxLines="100"
-        android:onClick="onClick"
-        android:scrollbars="vertical"
-        android:textSize="20sp" />
-
-    <CheckBox
-        android:id="@+id/checkbox1"
-        android:layout_width="102dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/editText2"
-        android:layout_marginTop="20dp"
-        android:text="Arrive At" />
+        android:layout_marginTop="32dp"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radioButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="21dp"
+            android:checked="true"
+            android:text="Depart At" />
+
+        <RadioButton
+            android:id="@+id/radioButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="22dp"
+            android:text="Arrive At" />
+    </RadioGroup>
 
 </RelativeLayout>
