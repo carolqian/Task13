@@ -4,12 +4,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-     <ImageView
+<!--      <ImageView
         android:id="@+id/imageView1"
         android:layout_width="306dp"
         android:layout_height="300dp"
-        android:src="@drawable/googlemap" />
-     
+        android:src="@drawable/googlemap" /> -->
+     <fragment
+       android:id="@+id/maproute"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       class="com.google.android.gms.maps.SupportMapFragment"/>
+
+<!--     <WebView
+        android:id="@+id/webView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" /> -->
+
      <CheckBox
         android:id="@+id/checkbox1"
         android:layout_width="302dp"
