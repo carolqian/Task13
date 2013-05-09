@@ -61,10 +61,8 @@ public class TripPlan extends Activity implements OnClickListener {
 	      cal.set(Calendar.MINUTE, timePicker.getCurrentMinute());
 	      date = cal.getTime();
 	      
-	      button1.setOnClickListener(this);
-		
+	      button1.setOnClickListener(this);		
 	} 
-	
 	
 	
 	@Override
@@ -80,7 +78,9 @@ public class TripPlan extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.button1) {
+//			Intent intent = new Intent(TripPlan.this, ShowMap.class); 	
 			Intent intent = new Intent(TripPlan.this, ShowRoute.class); 					
+
 			intent.putExtra("startLoc", fromT.getEditableText().toString());
 			intent.putExtra("endLoc", toT.getEditableText().toString());
 			intent.putExtra("time", date.getTime());

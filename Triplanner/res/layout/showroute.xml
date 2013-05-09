@@ -4,32 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <fragment
-        android:id="@+id/maproute"
-        android:layout_width="match_parent"
-        android:layout_height="169dp"
-        android:layout_weight="0.50"
-        class="com.google.android.gms.maps.SupportMapFragment" />
-
-    <CheckBox
-        android:id="@+id/checkbox1"
-        android:layout_width="302dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Set Arrival Alarm" />
-
-    <CheckBox
-        android:id="@+id/checkbox2"
-        android:layout_width="302dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Set Detour Warning" />
-
-    <CheckBox
-        android:id="@+id/checkbox2"
-        android:layout_width="302dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Accept Nearby AD" />
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="fill_parent"
+        android:layout_height="172dp"
+        android:layout_weight="0.23" >
+    </ListView>
 
 </LinearLayout>

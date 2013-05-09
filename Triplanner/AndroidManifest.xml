@@ -83,7 +83,7 @@
         </activity>
         
         <activity
-            android:name="com.example.triplanner.ShowRoute"
+            android:name="com.example.triplanner.ShowMap"
             android:label="Trip View" >
             <intent-filter>
                 <action android:name="android.intent.action.ANY_NAME" />
@@ -114,6 +114,25 @@
         
         <activity
             android:name="com.example.triplanner.ShowTableColon"
+            android:label="Trip View" >
+            <intent-filter>
+                <action android:name="android.intent.action.ANY_NAME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.example.triplanner.ShowRoute"
+            android:label="Trip View" >
+            <intent-filter>
+                <action android:name="android.intent.action.ANY_NAME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+                <activity
+            android:name="com.example.triplanner.ShowRouteDetail"
             android:label="Trip View" >
             <intent-filter>
                 <action android:name="android.intent.action.ANY_NAME" />

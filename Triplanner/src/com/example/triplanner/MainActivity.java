@@ -15,13 +15,13 @@ public class MainActivity extends Activity {
 	private Button button2;
 	private Button button3;
 	private Button button4;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		 
-		
+
+
 		webView = (WebView) findViewById(R.id.webView1);
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadUrl("http://www.google.com");
@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 		button2 = (Button) findViewById(R.id.button2); 
 		button3 = (Button) findViewById(R.id.button3); 
 		button4 = (Button) findViewById(R.id.button4); 
-		
+
 		addListenerOnButton();
 	}
 
@@ -44,12 +44,12 @@ public void addListenerOnButton(){
 			public void onClick(View arg0) {
 				Intent intent = new Intent(MainActivity.this, TripPlan.class); 
 				MainActivity.this.startActivity(intent);				
-		        
+
  
 			}
  
 		});
-		
+
 		button2.setOnClickListener(new OnClickListener() {
             
 			@Override
@@ -78,8 +78,8 @@ public void addListenerOnButton(){
 		public void onClick(View arg0) {
 			Intent intent = new Intent(MainActivity.this, SearchPlaces.class); 
 			MainActivity.this.startActivity(intent);			
-	        
-	
+
+
 		}
 
 		});
@@ -90,5 +90,4 @@ public void addListenerOnButton(){
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-
 }
