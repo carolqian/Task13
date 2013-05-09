@@ -43,10 +43,6 @@ public class ShowRoute extends Activity {
 	  
 	   class GetRoute extends AsyncTask<String, String, String> {
 			Geocoder geocoder = new Geocoder(ShowRoute.this);
-//			double minLatitude = Integer.MAX_VALUE;
-//			double maxLatitude = Integer.MIN_VALUE;
-//			double minLongitude = Integer.MAX_VALUE;
-//			double maxLongitude = Integer.MIN_VALUE;
 			
 	        @Override
 	        protected void onPreExecute() {
@@ -101,13 +97,12 @@ public class ShowRoute extends Activity {
 	                    }
 	                    input.close();
 	                }
-
 	                jsonOutput = response.toString();
 
 	                JSONObject jsonObject = new JSONObject(jsonOutput);
-	                routes = TransitHelper.ReadJSON(jsonObject);
+	                routes = TransitHelper.readTransit(jsonObject);
 	            } catch (Exception e) {
-
+	            	Log.d("error", e.getMessage());
 	            }
 	            return null;
 	        }

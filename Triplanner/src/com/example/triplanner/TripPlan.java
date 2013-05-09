@@ -22,9 +22,6 @@ import android.widget.RatingBar.OnRatingBarChangeListener;
 
 public class TripPlan extends Activity implements OnClickListener { 
 	private Button button1;  
-	
-//	private TextView from;
-//	private TextView to;
 	private EditText fromT;
 	private EditText toT;
 	private TimePicker timePicker;
@@ -39,15 +36,7 @@ public class TripPlan extends Activity implements OnClickListener {
 	        
 	      setContentView(R.layout.tripplan); 
 	      
-	      button1 = (Button) findViewById(R.id.button1); 	      
-	      
-//	      from = new TextView(this); 
-//	      from = (TextView)findViewById(R.id.TextView01); 
-//	      from.setText("From:");
-//	      
-//	      to = new TextView(this); 
-//	      to = (TextView)findViewById(R.id.TextView02); 
-//	      to.setText("To:");		
+	      button1 = (Button) findViewById(R.id.button1); 	      		
 	      
 	      fromT = (EditText) findViewById(R.id.editText1);
 	      toT = (EditText) findViewById(R.id.editText2);

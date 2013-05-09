@@ -11,25 +11,11 @@
         android:layout_weight="0.50"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
-    <CheckBox
-        android:id="@+id/checkbox1"
-        android:layout_width="302dp"
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Set Arrival Alarm" />
-
-    <CheckBox
-        android:id="@+id/checkbox2"
-        android:layout_width="302dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Set Detour Warning" />
-
-    <CheckBox
-        android:id="@+id/checkbox2"
-        android:layout_width="302dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Accept Nearby AD" />
+        android:layout_weight="0.19"
+        android:text="TextView" />
 
 </LinearLayout>

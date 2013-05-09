@@ -55,6 +55,9 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
         destination.setOnClickListener(this);
     }
     
+    
+    
+    
 	@Override
 	public void onClick(View v) {		
 		if (v.getId() == R.id.button1) {
@@ -147,6 +150,7 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
 						Address address = addresses.get(0);
 						StringBuilder sb = new StringBuilder();
 						for (int j = 0; j < address.getMaxAddressLineIndex(); j++) {
+							sb.append(" ");
 							sb.append(address.getAddressLine(j));
 						}
 						
