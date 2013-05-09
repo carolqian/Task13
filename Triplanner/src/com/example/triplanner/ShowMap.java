@@ -1,11 +1,7 @@
 package com.example.triplanner;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -13,42 +9,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class ShowMap extends FragmentActivity {  
-//	@Override
-//	protected void onCreate(Bundle savedInstanceState) {
-//		  super.onCreate(savedInstanceState);
-//	        
-//	      setContentView(R.layout.showroute); 
-//	      Intent intent = new Intent(android.content.Intent.ACTION_VIEW, 
-//	    		    Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345"));
-//	    		startActivity(intent);
-//	}
-	
+public class ShowMap extends FragmentActivity {  	
 	ProgressDialog pDialog;
     GoogleMap map;
-    List<LatLng> polyz;
+    List<ArrayList<LatLng>> walks;
+    List<ArrayList<LatLng>> buses;
     JSONArray array;
+    TextView tv;
 
     @SuppressLint("NewApi")
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,21 +48,23 @@ public class ShowMap extends FragmentActivity {
         setContentView(R.layout.showmap);
         map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maproute))
                 .getMap();
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(DUBLIN, 15));
-//        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        tv = (TextView) findViewById(R.id.textView1);
         new GetDirection().execute();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflate = getMenuInflater();
+    	inflate.inflate(R.menu.mapmenu, menu);
+    	return true;
+    }
+    
     class GetDirection extends AsyncTask<String, String, String> {
-    	Address start;
-    	Address end;
 		LatLng northeast;
 		LatLng southwest;
 		Geocoder geocoder = new Geocoder(ShowMap.this);
-//		double minLatitude = Integer.MAX_VALUE;
-//		double maxLatitude = Integer.MIN_VALUE;
-//		double minLongitude = Integer.MAX_VALUE;
-//		double maxLongitude = Integer.MIN_VALUE;
+		int routeNum;
+		TransitBean routeBean;
 		
         @Override
         protected void onPreExecute() {
@@ -85,16 +79,11 @@ public class ShowMap extends FragmentActivity {
         @Override
         protected String doInBackground(String... args) {
             Intent i = getIntent();
-            String startLocation = i.getStringExtra("startLoc");
-            String endLocation = i.getStringExtra("endLoc");
-//            String startLocation = "5000 Forbes Ave Pittsburgh PA";
-//            String endLocation = "3609 Beechwood Blvd Pittsburgh PA";
 
             try {
-                start = getAddress(startLocation);
-                end = getAddress(endLocation);
                 String jsonOutput = i.getStringExtra("routes");
-
+    			routeNum = i.getIntExtra("routeNum", 0);
+    			
                 JSONObject jsonObject = new JSONObject(jsonOutput);
 
                 // routesArray contains ALL routes
@@ -105,15 +94,52 @@ public class ShowMap extends FragmentActivity {
                 JSONObject bounds = route.getJSONObject("bounds");
                 northeast = getBound(bounds.getJSONObject("northeast"));
                 southwest = getBound(bounds.getJSONObject("southwest"));
-                JSONObject poly = route.getJSONObject("overview_polyline");
-                String polyline = poly.getString("points");
-                polyz = decodePoly(polyline);
+                
+                List<TransitBean> routes = TransitHelper.readTransit(jsonObject);
+                routeBean = routes.get(routeNum);
             } catch (Exception e) {
 
             }
-
             return null;
-
+        }
+        
+        private void displaySteps() {
+        	walks = new ArrayList<ArrayList<LatLng>>();
+        	buses = new ArrayList<ArrayList<LatLng>>();
+            List<Step> steps = routeBean.getSteps();
+            Log.d("map", "step size" + steps.size());
+            int count = 0;
+            for (int i = 0; i < steps.size(); i++) {
+            	Step step = steps.get(i);
+            	Log.d("map", "mode: " +  i + " " + step.getTravelMode());
+            	Log.d("map", "i " + i);
+            	if (step.getTravelMode().equals("WALKING")) {
+            		String encode = step.getPolyline();
+            		Log.d("map", "walk line: " + encode);
+            		ArrayList<LatLng> line = decodePoly(encode);
+            		Log.d("map", "walk line " + Arrays.toString(line.toArray()));
+            		Log.d("map", "count " + ++count);
+            		walks.add(line);
+            	} else if (step.getTravelMode().equals("TRANSIT")) {
+            		Log.d("map", "transit true");
+            		buses.add(decodePoly(step.getPolyline()));
+            		TransitDetail detail = step.getTransitDetail();
+                    map.addMarker(new MarkerOptions()
+                    .position(new LatLng(detail.getArrivalStopLoc()[0], detail.getArrivalStopLoc()[1]))
+                    .title("Arrive at " + detail.getDepartureStopName())
+                    .snippet("Line Num: "+detail.getLineNum()+" "+"Line Name: "+detail.getLineName())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                   
+                    map.addMarker(new MarkerOptions()
+                    .position(new LatLng(detail.getDepartureStopLoc()[0], detail.getDepartureStopLoc()[1]))
+                    .title("Depart from " + detail.getDepartureStopName())
+                    .snippet("Line Num: "+detail.getLineNum()+" "+"Line Name: "+detail.getLineName())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+//                    Log.d("map", "stop start" + Arrays.toString(routeBean.getStartLocation()));
+//                    Log.d("map", "route start" + Arrays.toString(step.getStartLocation()));
+            	}
+            }
+            Log.d("map", "walks size before: " + walks.size());
         }
 
         private LatLng getBound(JSONObject bound) throws JSONException {
@@ -121,67 +147,98 @@ public class ShowMap extends FragmentActivity {
         	return point;
         }
         
-        protected Address getAddress(String location) throws IOException {
-        	List<Address> addresses = geocoder.getFromLocationName(location, 10);
-        	if (addresses == null || addresses.size() < 1) return null;
-        	return addresses.get(0);
-        }
-        
-    	private void showNoRoute() {
-    		AlertDialog.Builder builder = new AlertDialog.Builder(ShowMap.this);
-            builder.setTitle("No Route Available")
-            	   .setMessage("There is no address available now. Please go back and search a valid address.")
-                   .setNegativeButton("Go back", new DialogInterface.OnClickListener() {
-                       public void onClick(DialogInterface dialog, int id) {
-                           dialog.dismiss();
-                       }
-                   });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-    	}
-        
         protected void onPostExecute(String file_url) {
-        	if (polyz == null) {
-        		Log.d("route", "no result");        		
-        		showNoRoute();
-        		pDialog.dismiss();
-        		return;
+//        	displayLine(polyz, Color.RED);
+        	displaySteps();
+        	Log.d("map", " walks size: " + walks.size());
+        	for (int i = 0; i < walks.size(); i++) {
+        		displayLine(walks.get(i), Color.BLACK);      		
+        	}	
+        	for (int i = 0; i < buses.size(); i++) {
+        		displayLine(buses.get(i), Color.RED);
         	}
-            for (int i = 0; i < polyz.size() - 1; i++) {
-                LatLng src = polyz.get(i);
-                LatLng dest = polyz.get(i + 1);
-                Polyline line = map.addPolyline(new PolylineOptions()
-                        .add(new LatLng(src.latitude, src.longitude),
-                                new LatLng(dest.latitude,                dest.longitude))
-                        .width(2).color(Color.RED).geodesic(true));
-                
-                
-            }
-            pDialog.dismiss();
-            
-//			Log.d("map maxLatitude", maxLatitude + "");
-//			Log.d("map minLatitude", minLatitude + "");
-//			Log.d("map maxLongitude", maxLongitude + "");
-//			Log.d("map minLongitude", minLongitude + "");			
 			
 	        map.moveCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(southwest, northeast), 50));	
 //	        map.moveCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(
 //	        		new LatLng(minLatitude, minLongitude), new LatLng(maxLatitude, maxLongitude)), 50));
+//            Log.d("map", "start location: " + Arrays.toString(routeBean.getStartLocation()));
+//            Log.d("map", "start location: " + routeBean.getStartAddr());
+//            Log.d("map", "end location: " + Arrays.toString(routeBean.getEndLocation()));
+     
+	        
+            Marker m = map.addMarker(new MarkerOptions()
+            .position(new LatLng(routeBean.getStartLocation()[0], routeBean.getStartLocation()[1]))
+            .title("Start Position")
+            .snippet(routeBean.getStartAddr())
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            );
+            m.showInfoWindow();
             
             map.addMarker(new MarkerOptions()
-            .position(new LatLng(start.getLatitude(), start.getLongitude()))
-            .title("Start Position")
-            .snippet(start.getAddressLine(0) == null? "": start.getAddressLine(0) ));
-            map.addMarker(new MarkerOptions()
-            .position(new LatLng(end.getLatitude(), end.getLongitude()))
+            .position(new LatLng(routeBean.getEndLocation()[0], routeBean.getEndLocation()[1]))
             .title("End Position")
-            .snippet(end.getAddressLine(0) == null? "": end.getAddressLine(0) ));
+            .snippet(routeBean.getEndAddr())
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            
+            setRouteText();
+            
+            pDialog.dismiss();		
+        }
+        
+        private void setRouteText() {
+			LinearLayout l = (LinearLayout) findViewById(R.id.list2);
+			
+			List<Step> steps = routeBean.getSteps();
+			for (int i = 0; i < steps.size() - 1; i++) {
+				Step step = steps.get(i);
+				ImageView image = new ImageView(ShowMap.this);
+				TextView t = new TextView(ShowMap.this);
+				t.setTextSize(20);
+				if (step.getTravelMode().equals("WALKING")) {
+					image.setImageResource(R.drawable.walking_icon);
+				} else if (step.getTravelMode().equals("TRANSIT")) {
+					image.setImageResource(R.drawable.bus_icon);
+					t.setText(step.getTransitDetail().getLineNum());
+				}
+				l.addView(image);
+				l.addView(t);
+				ImageView arrow = new ImageView(ShowMap.this);
+				arrow.setImageResource(R.drawable.arrow);
+				l.addView(arrow);
+			}
+			
+			Step step = steps.get(steps.size() - 1);
+			ImageView image = new ImageView(ShowMap.this);
+			TextView t = new TextView(ShowMap.this);			
+			if (step.getTravelMode().equals("WALKING")) {
+				image.setImageResource(R.drawable.walking_icon);
+			} else if (step.getTravelMode().equals("TRANSIT")) {
+				image.setImageResource(R.drawable.bus_icon);
+				t.setText(step.getTransitDetail().getLineNum());
+			}
+			l.addView(image);
+			l.addView(t);	
+			
+			TextView tv = (TextView) findViewById(R.id.textView1);
+			tv.setText(routeBean.toString());
+		
+        }
+        
+        private void displayLine(List<LatLng> line, int color) {
+            for (int i = 0; i < line.size() - 1; i++) {
+                LatLng src = line.get(i);
+                LatLng dest = line.get(i + 1);
+                Polyline polyline = map.addPolyline(new PolylineOptions()
+                        .add(new LatLng(src.latitude, src.longitude),
+                                new LatLng(dest.latitude, dest.longitude))
+                        .width(2).color(color).geodesic(true)); 
+            }
         }
         
         /* Method to decode polyline points */
-        private List<LatLng> decodePoly(String encoded) {
+        private ArrayList<LatLng> decodePoly(String encoded) {
 
-            List<LatLng> poly = new ArrayList<LatLng>();
+            ArrayList<LatLng> poly = new ArrayList<LatLng>();
             int index = 0, len = encoded.length();
             int lat = 0, lng = 0;
 
@@ -208,11 +265,6 @@ public class ShowMap extends FragmentActivity {
                 LatLng p = new LatLng((((double) lat / 1E5)),
                         (((double) lng / 1E5)));
                 poly.add(p);
-                
-//    			maxLatitude = Math.max(((double)lat / 1E5), maxLatitude);
-//    			minLatitude = Math.min(((double)lat / 1E5), minLatitude);
-//    			maxLongitude = Math.max(((double)lng / 1E5), maxLongitude);
-//    			minLongitude = Math.min(((double)lng / 1E5), minLongitude);
             }
 
             return poly;
