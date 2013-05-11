@@ -88,7 +88,8 @@ public class ShowRoute extends Activity {
 	            Log.d("route time:", timeToken);
 	            String stringUrl = "http://maps.googleapis.com/maps/api/directions/json?origin=" + startLocation + "&destination=" + endLocation + "&sensor=false" + timeToken + "&mode=transit&alternatives=true";
 //	               String stringUrl = "http://maps.googleapis.com/maps/api/directions/json?origin=5000+Forbes+Ave+Pittsburgh+PA&destination=3609+Beechwood+Blvd+Pittsburgh+PA&sensor=false&departure_time=1343605500&mode=transit";
-	                StringBuilder response = new StringBuilder();
+	            Log.d("route", "url: " + stringUrl);    
+	            StringBuilder response = new StringBuilder();
 	            try {
 	                URL url = new URL(stringUrl);
 	                HttpURLConnection httpconn = (HttpURLConnection) url

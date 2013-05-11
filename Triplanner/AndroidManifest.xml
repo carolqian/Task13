@@ -131,7 +131,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-                <activity
+         <activity
             android:name="com.example.triplanner.ShowRouteDetail"
             android:label="Trip View" >
             <intent-filter>
@@ -139,6 +139,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.example.triplanner.SearchPlacesDetail"
+            android:label="Place Detail">
         </activity>
     </application>
 

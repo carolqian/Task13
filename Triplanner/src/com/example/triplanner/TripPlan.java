@@ -6,15 +6,21 @@ import java.util.Date;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -22,7 +28,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 
-public class TripPlan extends Activity implements OnClickListener { 
+public class TripPlan extends Activity implements OnClickListener, OnCheckedChangeListener { 
 	private Button button1;  
 	private EditText fromT;
 	private EditText toT;
@@ -33,6 +39,8 @@ public class TripPlan extends Activity implements OnClickListener {
 	public final static int ARRIVAL_TIME = 2;
 	private String startLoc = null;
 	private String endLoc = null;
+	private CheckBox startGps;
+	private CheckBox endGps;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +52,9 @@ public class TripPlan extends Activity implements OnClickListener {
 	      
 	      fromT = (EditText) findViewById(R.id.editText1);
 	      toT = (EditText) findViewById(R.id.editText2);
-	      timePicker = (TimePicker) findViewById(R.id.timePicker1);      
+	      timePicker = (TimePicker) findViewById(R.id.timePicker1);  
+	      startGps = (CheckBox) findViewById(R.id.checkBox1);
+	      endGps = (CheckBox) findViewById(R.id.checkBox2);
 	      
 	      SharedPreferences preferences = getSharedPreferences("triplanner", 0);
 	      fromT.setText(preferences.getString("from", ""));
@@ -54,7 +64,21 @@ public class TripPlan extends Activity implements OnClickListener {
 	      cal.set(Calendar.MINUTE, timePicker.getCurrentMinute());
 	      date = cal.getTime();
 	      
-	      button1.setOnClickListener(this);		
+	      Intent intent = getIntent();
+	      String startAddr = intent.getStringExtra("startAddr");
+	      if (startAddr != null) {
+	    	  String endAddr = intent.getStringExtra("endAddr");
+	    	  startLoc = intent.getStringExtra("startLoc");
+	    	  endLoc = intent.getStringExtra("endLoc");
+	    	  
+	    	  fromT.setText(startAddr);
+	    	  toT.setText(endAddr);
+	      }
+	      
+	      button1.setOnClickListener(this);	
+	      
+	      startGps.setOnCheckedChangeListener(this);
+	      endGps.setOnCheckedChangeListener(this);
 	} 
 	
 	
@@ -71,11 +95,14 @@ public class TripPlan extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.button1) {
-//			Intent intent = new Intent(TripPlan.this, ShowMap.class); 	
 			Intent intent = new Intent(TripPlan.this, ShowRoute.class); 					
-
-			intent.putExtra("startLoc", fromT.getEditableText().toString());
-			intent.putExtra("endLoc", toT.getEditableText().toString());
+			
+			setGPS(startGps.isChecked(), endGps.isChecked());							
+			
+			intent.putExtra("startLoc", startLoc);
+			intent.putExtra("endLoc", endLoc);
+			
+			
 			intent.putExtra("time", date.getTime());
 			
 	        RadioButton depart = (RadioButton) findViewById(R.id.radioButton1);
@@ -93,6 +120,95 @@ public class TripPlan extends Activity implements OnClickListener {
 			intent.putExtra("timeType", timeType);
 			TripPlan.this.startActivity(intent);	
 		} 		
+	}
+
+	private void setGPS(boolean start, boolean end) {
+		if (!start && !end) {
+			startLoc = fromT.getEditableText().toString();
+			endLoc = toT.getEditableText().toString();
+			return;
+		}
+		
+	      LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+	      Location loc = manager.getLastKnownLocation(Context.LOCATION_SERVICE);
+	      final Loc laln = loc == null? new Loc() :new Loc(loc.getLatitude(), loc.getLongitude());
+	      
+	      LocationListener listener  = new LocationListener() {			
+			@Override
+			public void onStatusChanged(String provider, int status, Bundle extras) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProviderEnabled(String provider) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProviderDisabled(String provider) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onLocationChanged(Location location) {
+				laln.latitude = location.getLatitude();
+				laln.longitude = location.getLongitude();
+				Log.d("plan", "lat: " + location.getLatitude());
+				Log.d("plan", "lon: " + location.getLongitude());
+			}
+		};
+		
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+		
+		if (start) {
+			startLoc = laln.latitude + "," + laln.longitude;
+		} else {
+			startLoc = fromT.getEditableText().toString();
+		}
+		
+		if (end) {
+			endLoc = laln.latitude + "," + laln.longitude;
+		} else {
+			endLoc = toT.getEditableText().toString();
+		}
+	}
+
+	private static class Loc {
+		double latitude;
+		double longitude;
+		
+		public Loc () {
+			latitude = 0;
+			longitude = 0;
+		}
+		
+		public Loc (double lat, double lon) {
+			this.latitude = lat;
+			this.longitude = lon;
+		}
+	}
+	
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		if (buttonView.getId() == startGps.getId()) {
+			if (isChecked) {
+				fromT.setEnabled(false);				
+			} else {
+				fromT.setEnabled(true);
+			}
+			
+			
+		} else if (buttonView.getId() == endGps.getId()) {
+			if (isChecked) {
+				toT.setEnabled(false);
+			} else {
+				toT.setEnabled(true);				
+			}
+		}
+		
 	}
 	 
 }

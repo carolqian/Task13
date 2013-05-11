@@ -6,6 +6,7 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
@@ -20,11 +21,10 @@ import android.widget.EditText;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 @SuppressLint("NewApi")
@@ -34,8 +34,13 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
 	private EditText et;
 	private Button button;
 	private List<Address> availableAddresses;
+	
 	private Button origin;
 	private Button destination;
+	
+	Location ori;
+	Location des;
+	private Button plan;
 	
     @SuppressLint("NewApi")
 	@Override
@@ -50,38 +55,24 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
         et.setText(preferences.getString("search", ""));
         
         origin = (Button) findViewById(R.id.button2);
-        destination = (Button) findViewById(R.id.button3);        
-        origin.setOnClickListener(this);
-        destination.setOnClickListener(this);
+        destination = (Button) findViewById(R.id.button3);
+        
+        plan = (Button)findViewById(R.id.plan);
+        plan.setEnabled(false);
+        ori = null;
+        des = null;
     }
-    
-    
-    
     
 	@Override
 	public void onClick(View v) {		
 		if (v.getId() == R.id.button1) {
 			Log.d("search", "in click");
-			search = et.getEditableText().toString().trim();			
+			search = et.getEditableText().toString().trim();	
+			Log.d("search", "search :" + search);
 			setUpMapIfNeeded();
-		} else if (v.getId() == R.id.button2) {
-			if (availableAddresses == null || availableAddresses.size() == 0) {
-				showNoAddress();
-			} else {
-				
-			}
-		} else if (v.getId() == R.id.button3) {
-			if (availableAddresses == null || availableAddresses.size() == 0) {
-				showNoAddress();
-			} else {
-				chooseAddress(true);
-			}
 		}
 	}
-	
-	private void chooseAddress(boolean origin) {
-		
-	}
+
 	
 	private void showNoAddress() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(SearchPlaces.this);
@@ -105,7 +96,87 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
 		editor.commit();
 	}
     
-    private void setUpMapIfNeeded() {
+	
+	/** zhimeng
+	 * Result From SearchPlacesDetail.java */
+    @Override
+	protected void onActivityResult(int arg0, int arg1, Intent arg2) {
+		int decision = arg2.getIntExtra("decision", -1);
+		if(decision != -1){
+			switch(decision){
+			case SearchPlacesDetail.DECISION_ORI:
+				ori = new Location(
+						arg2.getStringExtra("title"),
+						arg2.getStringExtra("snippet"),
+						arg2.getDoubleExtra("lat", 0),
+						arg2.getDoubleExtra("lon", 0));
+				origin.setText("Origin Set.(X)");
+				origin.setVisibility(View.VISIBLE);
+				origin.setOnClickListener(new Button.OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						ori = null;
+						origin.setVisibility(View.INVISIBLE);
+						plan.setEnabled(false);
+					}
+				});
+				break;
+			case SearchPlacesDetail.DECISION_DES:
+				des = new Location(
+						arg2.getStringExtra("title"),
+						arg2.getStringExtra("snippet"),
+						arg2.getDoubleExtra("lat", 0),
+						arg2.getDoubleExtra("lon", 0));
+				destination.setText("Destination Set.(X)");
+				destination.setVisibility(View.VISIBLE);
+				destination.setOnClickListener(new Button.OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						des = null;
+						destination.setVisibility(View.INVISIBLE);
+						plan.setEnabled(false);
+					}
+				});
+				break;
+			}
+			if(ori != null && des != null){
+				plan.setEnabled(true);
+				plan.setOnClickListener(new Button.OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						Log.d("AHA","I MADE IT");
+						Intent intent = new Intent(SearchPlaces.this, TripPlan.class);
+						intent.putExtra("startAddr", ori.snippet);
+						intent.putExtra("endAddr", des.snippet);
+						intent.putExtra("startLoc", ori.lat + ", " + ori.lon);
+						intent.putExtra("endLoc", des.lat + ", " + des.lon);
+						startActivity(intent);
+					}
+				});
+			}
+		}
+		
+	}
+    /** zhimeng: Location info */
+    public static class Location{
+    	public String title;
+    	public String snippet;
+    	public double lat;
+    	public double lon;
+		public Location(String title, String snippet, double lat, double lon) {
+			super();
+			this.title = title;
+			this.snippet = snippet;
+			this.lat = lat;
+			this.lon = lon;
+		}
+    }
+
+    
+    
+	private void setUpMapIfNeeded() {
     	if (search == null || search.length() < 1) {
     		Log.d("search", "not get search term");
     		return;
@@ -117,20 +188,23 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
         }
             // Check if we were successful in obtaining the map.
         if (mMap != null) {
-            // The Map is verified. It is now safe to manipulate the map.
-//				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ll);
-//				Location lastLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//				LatLng laln = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-//
-//                CameraUpdate center=
-//                        CameraUpdateFactory.newLatLng(laln);
-//                    CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
-//
-//                    mMap.moveCamera(center);
-//                    mMap.animateCamera(zoom);
-//					mMap.addMarker(new MarkerOptions()
-//			        .position(laln)
-//			        .title("Your position"));
+        	mMap.clear();
+        	mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+				
+				@Override
+				public void onInfoWindowClick(Marker marker) {
+					String title = marker.getTitle();
+					String snippet = marker.getSnippet();
+					double lat = marker.getPosition().latitude;
+					double lon = marker.getPosition().longitude;
+					Intent intent = new Intent(getApplicationContext(),SearchPlacesDetail.class);
+					intent.putExtra("title", title);
+					intent.putExtra("snippet",snippet);
+					intent.putExtra("lat", lat);
+					intent.putExtra("lon", lon);
+					startActivityForResult(intent, 0);
+				}
+			});
 			
 			Geocoder geocoder = new Geocoder(this);
 			try {
@@ -144,13 +218,11 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
 				Log.d("map", "inconsole");
 				if (addresses == null || addresses.size() == 0) {
 					showNoAddress();
-				}
-				if (addresses != null && addresses.size() > 0) {
+				} else {
 					if (addresses.size() == 1) {
 						Address address = addresses.get(0);
 						StringBuilder sb = new StringBuilder();
 						for (int j = 0; j < address.getMaxAddressLineIndex(); j++) {
-							sb.append(" ");
 							sb.append(address.getAddressLine(j));
 						}
 						
@@ -189,20 +261,8 @@ public class SearchPlaces extends FragmentActivity implements OnClickListener {
 					        .position(laln)
 					        .title(address.getFeatureName())
 					        .snippet(sb.toString()));
-						}
-						Log.d("map maxLatitude", maxLatitude + "");
-						Log.d("map minLatitude", minLatitude + "");
-						Log.d("map maxLongitude", maxLongitude + "");
-						Log.d("map minLongitude", minLongitude + "");			
+						}	
 						
-//						final double ia = minLatitude;
-//						final double ao = maxLongitude;
-//						final double aa = maxLatitude;
-//						final double io = minLongitude;
-//							final double ia = 4042477.0;
-//							final double ao = -7992284.0;
-//							final double aa = 4044456.0;
-//							final double io = -7794254.0;
 						CameraUpdate bound = CameraUpdateFactory.newLatLngBounds(new LatLngBounds( 
 								new LatLng(minLatitude, minLongitude), new LatLng(maxLatitude, maxLongitude)), 50);						
 						mMap.moveCamera(bound);
