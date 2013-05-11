@@ -130,8 +130,6 @@ public class TripPlan extends Activity implements OnClickListener, OnCheckedChan
 		}
 		
 	      LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-	      Location loc = manager.getLastKnownLocation(Context.LOCATION_SERVICE);
-	      final Loc laln = loc == null? new Loc() :new Loc(loc.getLatitude(), loc.getLongitude());
 	      
 	      LocationListener listener  = new LocationListener() {			
 			@Override
@@ -154,16 +152,16 @@ public class TripPlan extends Activity implements OnClickListener, OnCheckedChan
 			
 			@Override
 			public void onLocationChanged(Location location) {
-				laln.latitude = location.getLatitude();
-				laln.longitude = location.getLongitude();
 				Log.d("plan", "lat: " + location.getLatitude());
 				Log.d("plan", "lon: " + location.getLongitude());
 			}
 		};
 		
-		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, listener);
+	      Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	      Loc laln = loc == null? new Loc() :new Loc(loc.getLatitude(), loc.getLongitude());
 		
-		if (start) {
+	      if (start) {
 			startLoc = laln.latitude + "," + laln.longitude;
 		} else {
 			startLoc = fromT.getEditableText().toString();

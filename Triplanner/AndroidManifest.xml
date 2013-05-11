@@ -144,6 +144,24 @@
             android:name="com.example.triplanner.SearchPlacesDetail"
             android:label="Place Detail">
         </activity>
+        <activity
+            android:name="com.example.triplanner.ScheduleByStationAndRoute"
+            android:label="But Station">
+            <intent-filter>
+                <action android:name="android.intent.action.ANY_NAME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>        
+        <activity
+            android:name="com.example.triplanner.ShowBusStopsByRoute"
+            android:label="But Station">
+            <intent-filter>
+                <action android:name="android.intent.action.ANY_NAME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>  
     </application>
 
 </manifest>

@@ -5,24 +5,6 @@
     android:orientation="vertical" >
 
     <Button
-        android:id="@+id/Button01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:text="Check Arrival" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="303dp"
-        android:layout_height="42dp"
-        android:layout_alignRight="@+id/TextView01"
-        android:layout_alignTop="@+id/Button01"
-        android:maxLines="100"
-        android:scrollbars="vertical"
-        android:textSize="30sp" />
-
-    <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,21 +26,13 @@
         android:id="@+id/editText1"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button1"
         android:layout_alignBottom="@+id/button1"
-        android:layout_alignRight="@+id/EditText01"
-        android:layout_marginRight="0dp"
+        android:layout_marginRight="17dp"
+        android:layout_toLeftOf="@+id/button1"
         android:ems="20" >
 
         <requestFocus />
     </EditText>
-
-    <EditText
-        android:id="@+id/EditText01"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/Button01"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/textView2"
-        android:ems="20" />
 
 </RelativeLayout>
