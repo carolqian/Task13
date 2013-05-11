@@ -28,7 +28,7 @@
 		    android:layout_height="50dp"
 		    android:ems="10"
 		    android:textSize="20sp" />
-
+    
 		<CheckBox
 		    android:id="@+id/checkBox1"
 		    android:layout_width="wrap_content"
@@ -37,7 +37,6 @@
       
     </LinearLayout>
     
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,6 +68,11 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="My position" />
+		    android:layout_width="222dp"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="10dp"
+		    android:ems="10"
+		    android:textSize="20sp"  />
         
     </LinearLayout>
 

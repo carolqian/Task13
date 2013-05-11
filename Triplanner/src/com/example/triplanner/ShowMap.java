@@ -135,8 +135,13 @@ public class ShowMap extends FragmentActivity {
                     .title("Depart from " + detail.getDepartureStopName())
                     .snippet("Line Num: "+detail.getLineNum()+" "+"Line Name: "+detail.getLineName())
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+ 
 //                    Log.d("map", "stop start" + Arrays.toString(routeBean.getStartLocation()));
 //                    Log.d("map", "route start" + Arrays.toString(step.getStartLocation()));
+
+                    Log.d("map", "stop start" + Arrays.toString(routeBean.getStartLocation()));
+                    Log.d("map", "route start" + Arrays.toString(step.getStartLocation()));
+
             	}
             }
             Log.d("map", "walks size before: " + walks.size());
@@ -221,7 +226,9 @@ public class ShowMap extends FragmentActivity {
 			
 			TextView tv = (TextView) findViewById(R.id.textView1);
 			tv.setText(routeBean.toString());
-		
+            tv.setText(routeBean.toString());
+            
+            pDialog.dismiss();		
         }
         
         private void displayLine(List<LatLng> line, int color) {
