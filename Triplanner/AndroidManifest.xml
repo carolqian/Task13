@@ -131,6 +131,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+          <activity
+            android:name="com.example.triplanner.ShowRouteByStation"
+            android:label="All Routes" >
+            <intent-filter>
+                <action android:name="android.intent.action.ANY_NAME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
          <activity
             android:name="com.example.triplanner.ShowRouteDetail"
             android:label="Trip View" >
@@ -161,6 +170,12 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+                <activity
+            android:name="com.example.triplanner.ShowBusMap"
+            android:label="But Station"            
+            >
+            
         </activity>  
     </application>
 

@@ -21,7 +21,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class BusSchedule extends Activity {
-	String urltest = "http://128.237.200.104/android_connect/getbusstopsbyroute.php";
+	String urltest = "http://"+GlobalVariables.IPaddress+"/getbusstopsbyroute.php";
 	private TextView tv;
 	private TextView tv1;
 	private Button button1;
